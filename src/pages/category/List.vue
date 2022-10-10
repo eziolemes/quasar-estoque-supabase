@@ -17,6 +17,9 @@
         <q-btn
           label="Add New"
           color="primary"
+          icon="mdi-plus"
+          dense
+          :to="{ name: 'form-category' }"
         />
       </template>
         <template v-slot:body-cell-actions="props">
