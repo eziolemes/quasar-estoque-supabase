@@ -15,7 +15,7 @@
             />
 
             <q-btn
-              label="Save"
+              :label="isUpdate ? 'Update' : 'Save'"
               color="primary"
               class="full-width"
               rounded
@@ -23,7 +23,7 @@
             />
 
             <q-btn
-              label="Save"
+              label="Cancel"
               color="primary"
               class="full-width"
               rounded
@@ -47,26 +47,41 @@ export default defineComponent({
     const table = 'category'
     const router = useRouter()
     const route = useRoute()
-    const { post } = useApi()
+    const { post, getById, update } = useApi()
     const { notifyError, notifySuccess } = useNotify()
 
     const isUpdate = computed(() => route.params.id)
 
+    let category = {}
     const form = ref({
       name: ''
     })
 
     onMounted(() => {
       if (isUpdate.value) {
-        alert('É para atualizar')
+        handleGetCategory(isUpdate.value)
       }
     })
 
     const handleSubmit = async () => {
       try {
-        await post(table, form.value)
-        notifySuccess('Saved Successfully')
+        if (isUpdate.value) {
+          await update(table, form.value)
+          notifySuccess('Update Successfully')
+        } else {
+          await post(table, form.value)
+          notifySuccess('Saved Successfully')
+        }
         router.push({ name: 'category' })
+      } catch (error) {
+        notifyError(error.message)
+      }
+    }
+
+    const handleGetCategory = async (id) => {
+      try {
+        category = await getById(table, id)
+        form.value = category
       } catch (error) {
         notifyError(error.message)
       }
@@ -74,7 +89,8 @@ export default defineComponent({
 
     return {
       handleSubmit,
-      form
+      form,
+      isUpdate
     }
   }
 })
